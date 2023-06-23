@@ -1,0 +1,4 @@
+#Thu Jun 22 18:20:39 BRT 2023
+base.0=C\:\\_Projetos\\ccb-br-mobt-00\\flutter_ccb_br_mobt_00\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
