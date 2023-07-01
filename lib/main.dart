@@ -1,10 +1,10 @@
-/*
-China Construction Bank - Brasil
-TOKEN Generator
-
-Jun/2023
-Author: Rai Junior
-*/
+/// -----------------------------------------------------------------
+/// China Construction Bank - Brasil
+/// TOKEN Generator
+/// -------------------
+/// Jun/2023
+/// Author: Rai Junior
+/// -----------------------------------------------------------------
 
 // Based on MATERIAL package
 import 'package:flutter/material.dart';
@@ -104,7 +104,7 @@ class SetupFlowState extends State<SetupFlow> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: const Text('Are you sure?'),
+                title: const Text('Tem certeza?'),
                 content: const Text(
                     'If you exit device setup, your progress will be lost.'),
                 actions: [
@@ -112,13 +112,13 @@ class SetupFlowState extends State<SetupFlow> {
                     onPressed: () {
                       Navigator.of(context).pop(true);
                     },
-                    child: const Text('Leave'),
+                    child: const Text('Sair'),
                   ),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pop(false);
                     },
-                    child: const Text('Stay'),
+                    child: const Text('Ficar'),
                   ),
                 ],
               );

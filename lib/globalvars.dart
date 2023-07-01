@@ -15,3 +15,7 @@ const routeDeviceSetupFinishedPage = 'finished';
 const routeTokenActivate = '/token_activate';
 const routeTokenGenerator = '/token_generator';
 const routeQRView = '/token/qrViewCCB';
+const routeShowAlert = '/common/show_alert';
+
+String tokenCCB = '';
+int tokenPeriod = 30;

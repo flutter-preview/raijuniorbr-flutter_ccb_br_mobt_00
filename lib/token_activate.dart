@@ -25,6 +25,7 @@ import 'dart:convert';
 // URL Launcher
 //import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Business module
 // Project´s global vars
@@ -60,6 +61,19 @@ Future<dynamic> _launchURLApp(String? code) async {
 }
 */
 
+Future<bool> _saveItems(String json) async {
+  List<String>? tokens;
+  final prefs = await SharedPreferences.getInstance();
+  try {
+    tokens = [json];
+    prefs.setStringList('items', tokens);
+    return true;
+  } on Exception catch (e) {
+    log('Erro: ${e.toString()}');
+    return false;
+  }
+}
+
 Future<bool> fetchVirtualToken(QrCodeData? code) async {
   //var uri = 'https:\/\/www2.des.br.ccb.com:8443\/mga\/sps\/mmfa\/user\/mgmt\/details' '/cadastrar';
   var uri = code!.details_url;
@@ -82,13 +96,17 @@ Future<bool> fetchVirtualToken(QrCodeData? code) async {
 
   try {
     //final response = await http.get(Uri.parse(uri));
-    final response = await http.post(Uri.parse(uri), body: body, headers: headers).timeout(const Duration(seconds: 20));
+    final response = await http
+        .post(Uri.parse(uri), body: body, headers: headers)
+        .timeout(const Duration(seconds: 20));
 
     if (response.statusCode == 200) {
       return true; // VirtualToken.fromJson(jsonDecode(response.body));
     } else {
       log('Erro no POST: ${response.statusCode}');
-      return false;
+      // estou mockando
+      return true;
+      //return false;
     }
   } on TimeoutException {
     log('Erro timeout');
@@ -215,7 +233,8 @@ class _TokenActivateState extends State<TokenActivate> {
               );
  */
             },
-            label: Text('Ativar token virtual CCB Brasil', style: Theme.of(context).textTheme.titleLarge),
+            label: Text('Ativar token virtual CCB Brasil',
+                style: Theme.of(context).textTheme.titleLarge),
           )
         ],
       )),
@@ -224,6 +243,43 @@ class _TokenActivateState extends State<TokenActivate> {
           Navigator.pop(context);
         },
         child: const Icon(Icons.arrow_back),
+      ),
+    );
+  }
+}
+
+class ShowAlert extends StatefulWidget {
+  const ShowAlert({super.key, required this.message, this.redAlert});
+
+  final String message;
+  final bool? redAlert;
+
+  @override
+  State<StatefulWidget> createState() => _ShowAlertState();
+}
+
+class _ShowAlertState extends State<ShowAlert> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: AlertDialog(
+        backgroundColor: (widget.redAlert! ? Colors.red : Colors.green),
+        title: Text('Alerta', style: Theme.of(context).textTheme.titleLarge),
+        content: Text(widget.message,
+            style: Theme.of(context).textTheme.titleMedium),
+        actions: <Widget>[
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, globals.routeHome, (route) => false);
+              },
+              child: const Text('Fechar')),
+        ],
       ),
     );
   }
@@ -239,6 +295,7 @@ class QRViewCCB extends StatefulWidget {
 class _QRViewCCBState extends State<QRViewCCB> {
   late bool meuRetorno = false;
   Barcode? result;
+  QrCodeData? qrCodeData;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
@@ -270,17 +327,40 @@ class _QRViewCCBState extends State<QRViewCCB> {
           );
         });
 
-    // Your asynchronous computation here (fetching data from an API, processing files, inserting something to the database, etc)
-    meuRetorno = await fetchVirtualToken(QrCodeData.fromJson(jsonDecode(code!)));
+    controller!.stopCamera();
+    try {
+      qrCodeData = QrCodeData.fromJson(jsonDecode(code!));
+      // Your asynchronous computation here (fetching data from an API, processing files, inserting something to the database, etc)
+      meuRetorno = await fetchVirtualToken(qrCodeData);
+      meuRetorno = await _saveItems(code);
+    } on Exception catch (e) {
+      log('Error: ${e.toString()}');
+      meuRetorno = false;
+    }
     //await Future.delayed(const Duration(seconds: 3));
 
     // Close the dialog programmatically
     // We use "mounted" variable to get rid of the "Do not use BuildContexts across async gaps" warning
     if (mounted) {
       if (!meuRetorno) {
-        Navigator.pushNamed(context, globals.routeTokenActivate);
+        //Navigator.pushReplacementNamed(context, globals.routeShowAlert);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => const ShowAlert(
+                  message:
+                      'QRCode parece não ser compatível.\nTente novamente.',
+                  redAlert: true),
+            ));
       } else {
-        Navigator.pushNamed(context, globals.routeHome);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => const ShowAlert(
+                message: 'QRCode ativado com sucesso!',
+                redAlert: false,
+              ),
+            ));
       }
     }
     return;
@@ -302,7 +382,7 @@ class _QRViewCCBState extends State<QRViewCCB> {
     return Scaffold(
       body: Column(
         children: <Widget>[
-          Expanded(flex: 1, child: _buildQrView(context)),
+          Expanded(flex: 2, child: _buildQrView(context)),
           Expanded(
             flex: 1,
             child: FittedBox(
@@ -311,14 +391,21 @@ class _QRViewCCBState extends State<QRViewCCB> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   if (result != null)
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      icon: const Icon(Icons.app_registration),
-                      onPressed: () => _fetchData(context, result?.code),
-                      label: Text(
-                          //'Data: ${result!.code}\n'
-                          'Pressione para Ativar token',
-                          style: Theme.of(context).textTheme.titleLarge),
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green),
+                        icon: const Icon(Icons.app_registration),
+                        onPressed: () => _fetchData(context, result?.code),
+                        label: Padding(
+                          padding: const EdgeInsets.all(18.0),
+                          child: Text(
+                              //'Data: ${result!.code}\n'
+                              'Leitura realizada.\nPressione para ativar.',
+                              style: Theme.of(context).textTheme.titleLarge),
+                        ),
+                      ),
                     )
 /*                     Text(
                         'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}\n'
@@ -326,7 +413,14 @@ class _QRViewCCBState extends State<QRViewCCB> {
                         "${_qrRead(describeEnum(result!.format), result!.code, context)}")
  */
                   else
-                    const Text('Escanear o QR Code gerado'),
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text(
+                          'Posicione seu celular na frente \n'
+                          'da tela do seu computador para ler\n'
+                          'a imagem QR Code gerada pelo \nInternet Banking.',
+                          style: Theme.of(context).textTheme.titleLarge),
+                    ),
 /*                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -410,15 +504,21 @@ class _QRViewCCBState extends State<QRViewCCB> {
 
   Widget _buildQrView(BuildContext context) {
     // For this CCB we check how width or tall the device is and change the scanArea and overlay accordingly.
-    var scanArea =
-        (MediaQuery.of(context).size.width < 400 || MediaQuery.of(context).size.height < 400) ? 150.0 : 300.0;
+    var scanArea = (MediaQuery.of(context).size.width < 400 ||
+            MediaQuery.of(context).size.height < 400)
+        ? 150.0
+        : 300.0;
     // To ensure the Scanner view is properly sizes after rotation
     // we need to listen for Flutter SizeChanged notification and update controller
     return QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
       overlay: QrScannerOverlayShape(
-          borderColor: Colors.red, borderRadius: 10, borderLength: 30, borderWidth: 10, cutOutSize: scanArea),
+          borderColor: Colors.red,
+          borderRadius: 10,
+          borderLength: 30,
+          borderWidth: 10,
+          cutOutSize: scanArea),
       onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
     );
   }
