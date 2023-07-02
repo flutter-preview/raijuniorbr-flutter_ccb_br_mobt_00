@@ -4,7 +4,7 @@
             "outputFile": "com.example.flutter_ccb_br_mobt_00.app-mergeDebugResources-20:/values-v22/values-v22.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Rai-CCB\\.gradle\\caches\\transforms-3\\23f34eb679aa78d319ba4cd6be929827\\transformed\\appcompat-1.4.2\\res\\values-v22\\values-v22.xml",
+                    "source": "/Users/raijunior/.gradle/caches/transforms-3/23f34eb679aa78d319ba4cd6be929827/transformed/appcompat-1.4.2/res/values-v22/values-v22.xml",
                     "from": {
                         "startLines": "2,3,4,9",
                         "startColumns": "4,4,4,4",

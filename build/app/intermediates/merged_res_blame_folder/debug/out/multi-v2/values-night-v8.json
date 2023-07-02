@@ -4,7 +4,7 @@
             "outputFile": "com.example.flutter_ccb_br_mobt_00.app-mergeDebugResources-20:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Rai-CCB\\.gradle\\caches\\transforms-3\\23f34eb679aa78d319ba4cd6be929827\\transformed\\appcompat-1.4.2\\res\\values-night-v8\\values-night-v8.xml",
+                    "source": "/Users/raijunior/.gradle/caches/transforms-3/23f34eb679aa78d319ba4cd6be929827/transformed/appcompat-1.4.2/res/values-night-v8/values-night-v8.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -21,14 +21,14 @@
                     }
                 },
                 {
-                    "source": "C:\\_Projetos\\ccb-br-mobt-00\\flutter_ccb_br_mobt_00\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "/Users/raijunior/gitProjects/flutter_ccb_br_mobt_00/android/app/src/main/res/values-night/styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
-                        "startOffsets": "175,831",
+                        "startOffsets": "172,817",
                         "endLines": "7,16",
                         "endColumns": "12,12",
-                        "endOffsets": "482,997"
+                        "endOffsets": "475,981"
                     },
                     "to": {
                         "startLines": "2,6",

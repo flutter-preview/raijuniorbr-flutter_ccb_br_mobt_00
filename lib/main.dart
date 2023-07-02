@@ -8,18 +8,18 @@
 
 // Based on MATERIAL package
 import 'package:flutter/material.dart';
-import 'package:flutter_ccb_br_mobt_00/token_activate.dart';
-import 'package:flutter_ccb_br_mobt_00/token_generator.dart';
+import 'package:flutter_ccb_br_mobt_00/modules/token_activate.dart';
+import 'package:flutter_ccb_br_mobt_00/modules/token_generator.dart';
 
 // import the business modules
-import 'home_ccb.dart';
-import 'globalvars.dart' as globals;
+import 'modules/home_ccb.dart';
+import 'commons/globalvars.dart' as globals;
 
 // Main
 void main() {
   runApp(MaterialApp(
     title: 'CCB Brasil',
-    //home: HomeCCB(temToken: false)),
+    home: const HomeCCB(),
     onGenerateRoute: (settings) {
       late Widget page;
       if (settings.name == globals.routeHome) {

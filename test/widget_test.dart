@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 //import 'package:flutter_ccb_br_mobt_00/main.dart';
-import 'package:flutter_ccb_br_mobt_00/home_ccb.dart';
+import 'package:flutter_ccb_br_mobt_00/modules/home_ccb.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
